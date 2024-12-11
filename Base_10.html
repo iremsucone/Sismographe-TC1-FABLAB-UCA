@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>Titre de l'onglet</title>
+	
+	
+	<!-- Lien vers les fontes Google !-->
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=ABeeZee&family=Libre+Franklin:wght@100&family=Noto+Sans&family=Overpass:wght@600&family=Roboto&display=swap" rel="stylesheet"> 
+	
+	<!-- Pour les menus !-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	
+	<!-- Lien vers la feuille de style !-->
+	<link href="style5.css" rel="stylesheet" type="text/css">
+	
+  </head>
+  
+  
+  
+  <body>
+	
+	<!-- Bandeau d'en-tête !-->
+	<div id="entete">
+		<h1> 
+			Projet FABLAB 24/25
+		</h1>
+		<h2> Sismographe </h2>
+	</div>
+	
+	
+	<!-- Div de Bootstrap -->
+	<div class="container">
+	
+		<!-- Boutons de navigation -->
+		<ul class="nav nav-pills" role="tablist">
+			<li class="nav-item">
+			  <a class="nav-link active" data-toggle="pill" href="#home"> Présentation </a>
+			</li>
+			
+			<li class="nav-item">
+			  <a class="nav-link" data-toggle="pill" href="#menu1"> Fonctionnement </a>
+			</li>
+			
+			<li class="nav-item">
+			  <a class="nav-link" data-toggle="pill" href="#menu2"> Données </a>
+			</li>
+
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="pill" href="#menu3"> Programmation </a>
+			  </li>
+		</ul>
+	
+	
+	
+		<!-- Contenu de chaque menu !-->
+		<div class="tab-content">
+			
+			<div id="home" class="container tab-pane active"><br>
+				  <h3>Présentation</h3>
+				  <p>Bienvenue, vous vous trouvez sur le menu d'Accueil !</p>
+			</div>
+			
+			<div id="menu1" class="container tab-pane fade"><br>
+				  <h3>Sismographe</h3>
+				  <p>La présentation du capteur et les données en direct.</p>
+				  <head>
+					<meta charset="UTF-8">
+					<title>Seismometer Simulation</title>
+					<style>
+					  body {
+						display: column;
+						flex-direction: column;
+						justify-content: center;
+						align-items: center;
+						height: 200vh;
+						margin: 100;
+						background-color: #f4f4f4;
+					  }
+					  canvas {
+						border: 1px solid black;
+					  }
+					  .controls {
+						margin-bottom: 10px;
+					  }
+					</style>
+				  </head>
+				  <body>
+					<div class="controls">
+					  <label for="shakeStrength">Intensité du séisme:</label>
+					  <input type="range" id="shakeStrength" min="0" max="20" value="10">
+					</div>
+					<canvas id="seismometerCanvas" width="400" height="600"></canvas>
+				  
+					<script>
+					  const canvas = document.getElementById('seismometerCanvas');
+					  const ctx = canvas.getContext('2d');
+					  const shakeStrengthControl = document.getElementById('shakeStrength');
+				  
+					  // Spring and weight properties
+					  const springAnchor = { x: 200, y: 100 }; // Fixed point for the spring
+					  const weight = { x: 200, y: 300, width: 40, height: 40 }; // Weight dimensions
+					  const springLength = 150; // Resting length of the spring
+					  const springStiffness = 0.05; // Controls the stiffness of the spring
+					  const damping = 0.03; // Reduces oscillations
+				  
+					  // Ground properties
+					  const groundHeight = 20;
+					  let groundOffset = 0; // Current ground displacement
+					  let groundShakeAmplitude = 10; // Amplitude of the shaking
+					  let groundShakeFrequency = 3; // Frequency of the shaking
+					  let time = 0; // Animation time
+				  
+					  // Simulation state
+					  let velocity = 0; // Vertical velocity of the weight
+					  let displacement = 0; // Current displacement from the spring's equilibrium
+				  
+					  // Draw the tubular casing
+					  function drawCasing() {
+						ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+						ctx.fillRect(springAnchor.x - 50, springAnchor.y, 100, 400); // Transparent tube
+						ctx.strokeStyle = 'black';
+						ctx.strokeRect(springAnchor.x - 50, springAnchor.y, 100, 400); // Outline of the tube
+					  }
+				  
+					  // Draw the spring
+					  function drawSpring() {
+						const numCoils = 12; // Number of coils in the spring
+						const coilHeight = (weight.y - springAnchor.y) / numCoils; // Height per coil
+				  
+						ctx.beginPath();
+						ctx.moveTo(springAnchor.x, springAnchor.y);
+						for (let i = 1; i <= numCoils; i++) {
+						  const xOffset = i % 2 === 0 ? -10 : 10; // Alternate left and right
+						  ctx.lineTo(springAnchor.x + xOffset, springAnchor.y + i * coilHeight);
+						}
+						ctx.lineTo(weight.x, weight.y); // Connect to the weight
+						ctx.strokeStyle = '#0000ff';
+						ctx.lineWidth = 2;
+						ctx.stroke();
+					  }
+				  
+					  // Draw the weight (as a coil)
+					  function drawWeight() {
+						ctx.fillStyle = '#ff6600';
+						ctx.fillRect(weight.x - weight.width / 2, weight.y, weight.width, weight.height); // Main weight
+				  
+						// Simulate a copper coil
+						ctx.strokeStyle = '#b87333';
+						ctx.lineWidth = 4;
+						for (let i = 0; i < 6; i++) {
+						  ctx.beginPath();
+						  ctx.moveTo(weight.x - 15, weight.y + i * 7);
+						  ctx.lineTo(weight.x + 15, weight.y + i * 7);
+						  ctx.stroke();
+						}
+					  }
+				  
+					  // Draw the tripod base
+					  function drawTripod() {
+						ctx.beginPath();
+						ctx.moveTo(springAnchor.x - 50, springAnchor.y + 400); // Left leg
+						ctx.lineTo(springAnchor.x - 70, springAnchor.y + 450);
+						ctx.moveTo(springAnchor.x + 50, springAnchor.y + 400); // Right leg
+						ctx.lineTo(springAnchor.x + 70, springAnchor.y + 450);
+						ctx.moveTo(springAnchor.x, springAnchor.y + 400); // Middle leg
+						ctx.lineTo(springAnchor.x, springAnchor.y + 450);
+						ctx.strokeStyle = 'black';
+						ctx.lineWidth = 3;
+						ctx.stroke();
+					  }
+				  
+					  // Draw the ground
+					  function drawGround() {
+						ctx.fillStyle = '#008000';
+						ctx.fillRect(0, canvas.height - groundHeight + groundOffset, canvas.width, groundHeight);
+					  }
+				  
+					  // Update the simulation
+					  function update() {
+						// Ground shaking (simulate earthquake)
+						groundOffset = groundShakeAmplitude * Math.sin(groundShakeFrequency * time);
+				  
+						// Spring force and damping
+						const springForce = -springStiffness * displacement;
+						const dampingForce = -damping * velocity;
+						const netForce = springForce + dampingForce;
+				  
+						// Update physics
+						velocity += netForce;
+						displacement += velocity;
+				  
+						// Update weight position
+						weight.y = springAnchor.y + springLength + displacement + groundOffset;
+				  
+						// Update time
+						time += 0.016;
+					  }
+				  
+					  // Render the scene
+					  function render() {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						drawCasing();
+						drawSpring();
+						drawWeight();
+						drawTripod();
+						drawGround();
+					  }
+				  
+					  // Main animation loop
+					  function animate() {
+						update();
+						render();
+						requestAnimationFrame(animate);
+					  }
+				  
+					  // Start the animation
+					  animate();
+				  
+					  // Adjust ground shake strength dynamically
+					  shakeStrengthControl.addEventListener('input', () => {
+						groundShakeAmplitude = parseFloat(shakeStrengthControl.value);
+					  });
+					</script>
+				  </body>
+			</div>
+			
+			<div id="menu2" class="container tab-pane fade"><br>
+				  <h3>Donnees et interprétation</h3>
+				  <p> L'historique des ondes sous forme de graphiques.</p>
+			</div>
+			
+			<div id="menu3" class="container tab-pane fade"><br>
+				<h3>Programmation</h3>
+				<p> Codes Python </p>
+		  </div>
+		  
+		</div>
+	  
+	  
+	</div>  
+	
+  </body>
+  
+</html>

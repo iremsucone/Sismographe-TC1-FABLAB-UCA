@@ -1,0 +1,70 @@
+html {
+  background-color:  #75160c ;
+}
+
+body {
+   background-color:  #f0dfce ;
+   width: 70%;                               /* Largeur = 70% de l'élément html (ne pas préciser de dimensions absolues permet à la page de s'adapter à l'écran)*/
+   margin: 0 auto;                           /* marge extérieure à l'élèment*/
+   padding: 0px 0px 0px 0px;                /* marge intérieure : haut droite bas gauche*/
+   line-height : 1.5; 
+   font-family: 'Roboto', sans-serif;
+   border-radius: 10px;
+} 
+
+#entete{
+	background-image: url(https://cdn.futura-sciences.com/cdn-cgi/image/width=1024,quality=60,format=auto/sources/images/dossier/1666/06-1666.jpg);
+    width: 100%;                             /* Largeur = 100% de l'élément body dans lequel il est placé */
+	margin: 0 auto ;                         /* marge extérieure*/
+    padding: 100px 100px 10px 100px;	             /* marge intérieure*/
+	border-radius: 10px;
+}
+
+h1{
+   font-weight: normal;
+   font-size: 3em; 
+   color: #573702;
+   text-align: center;
+}
+
+h2{
+   font-weight: normal;
+   font-size: 2em; 
+   color: #573702;
+   text-align: center;
+}
+
+/* Pour redimensionner les images*/
+.Imagereduite{
+	   width : 50%;
+	   margin: 0 auto;
+}
+
+
+img{
+  display: block;
+  margin: 0 auto;
+}
+	
+p{
+	padding: 0px 20px 0px 20px; 	
+}	
+
+
+/* Style des onglets */
+.nav-pills .nav-link:not(.active) { /* Onglet non actif*/
+    background-color: none;
+    color: #504e4e;
+}
+
+.nav-pills .nav-link.active { /* Onglet actif*/
+    background-color: #ffc908;
+    color: white;
+}
+
+
+.tab-content h3 {
+	text-align: center;
+	padding-bottom : 20px;
+	color: #504e4e;
+}
