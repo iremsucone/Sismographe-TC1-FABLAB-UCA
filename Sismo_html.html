@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>Titre de l'onglet</title>
+	
+	
+	<!-- Lien vers les fontes Google !-->
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=ABeeZee&family=Libre+Franklin:wght@100&family=Noto+Sans&family=Overpass:wght@600&family=Roboto&display=swap" rel="stylesheet"> 
+	
+	<!-- Pour les menus !-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	
+	<!-- Lien vers la feuille de style !-->
+	<link href="Sismo_style.css" rel="stylesheet" type="text/css">
+	
+  </head>
+  
+  
+  
+  <body>
+	
+	<!-- Bandeau d'en-tête !-->
+	<div id="entete">
+		<h1> 
+			Projet FABLAB 24/25
+		</h1>
+		<h2> Sismographe </h2>
+	</div>
+	
+	
+	<!-- Div de Bootstrap -->
+	<div class="container">
+	
+		<!-- Boutons de navigation -->
+		<ul class="nav nav-pills" role="tablist">
+			<li class="nav-item">
+			  <a class="nav-link active" data-toggle="pill" href="#home"> Présentation </a>
+			</li>
+			
+			<li class="nav-item">
+			  <a class="nav-link" data-toggle="pill" href="#menu1"> Simulation </a>
+			</li>
+
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="pill" href="#menu2"> Fonctionnement </a>
+			  </li>
+			
+			<li class="nav-item">
+			  <a class="nav-link" data-toggle="pill" href="#menu3"> Données </a>
+			</li>
+
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="pill" href="#menu4"> Programmation </a>
+			  </li>
+		</ul>
+	
+	
+	
+		<!-- Contenu de chaque menu !-->
+		<div class="tab-content">
+			
+			<div id="home" class="container tab-pane active"><br>
+				  <h3>Présentation</h3>
+				  <p>Bienvenue, vous vous trouvez sur le menu d'Accueil !</p>
+			</div>
+			
+			<div id="menu1" class="container tab-pane fade"><br>
+            
+           
+                
+                <h3>Sismographe</h3>
+				  <p>La présentation du sismographe</p>
+				  <head>
+					<meta charset="UTF-8">
+					<title>Seismometer Simulation</title>
+					<style>
+                        
+					  body {
+						display: center;
+						flex-direction: center;
+						justify-content: center;
+						align-items: center;
+						height: auto;
+						margin: 100;
+                    
+						background-color: #f4f4f4;
+					  }
+                    
+					  canvas {
+						border: 1px solid black;
+					  }
+					  .controls {
+						margin-bottom: 10px;
+					  }
+					</style>
+				  </head>
+				  <body>
+					<div class="controls">
+					  <label for="shakeStrength">Intensité du séisme:</label>
+					  <input type="range" id="shakeStrength" min="0" max="20" value="10">
+					</div>
+					<canvas id="seismometerCanvas" width="400" height="600"></canvas>
+				  
+					<script>
+					  const canvas = document.getElementById('seismometerCanvas');
+					  const ctx = canvas.getContext('2d');
+					  const shakeStrengthControl = document.getElementById('shakeStrength');
+				  
+					  // Spring and weight properties
+					  const springAnchor = { x: 200, y: 100 }; // Fixed point for the spring
+					  const weight = { x: 200, y: 300, width: 40, height: 40 }; // Weight dimensions
+					  const springLength = 150; // Resting length of the spring
+					  const springStiffness = 0.05; // Controls the stiffness of the spring
+					  const damping = 0.03; // Reduces oscillations
+				  
+					  // Ground properties
+					  const groundHeight = 20;
+					  let groundOffset = 0; // Current ground displacement
+					  let groundShakeAmplitude = 10; // Amplitude of the shaking
+					  let groundShakeFrequency = 3; // Frequency of the shaking
+					  let time = 0; // Animation time
+				  
+					  // Simulation state
+					  let velocity = 0; // Vertical velocity of the weight
+					  let displacement = 0; // Current displacement from the spring's equilibrium
+				  
+					  // Draw the tubular casing
+					  function drawCasing() {
+						ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+						ctx.fillRect(springAnchor.x - 50, springAnchor.y, 100, 400); // Transparent tube
+						ctx.strokeStyle = 'black';
+						ctx.strokeRect(springAnchor.x - 50, springAnchor.y, 100, 400); // Outline of the tube
+					  }
+				  
+					  // Draw the spring
+					  function drawSpring() {
+						const numCoils = 12; // Number of coils in the spring
+						const coilHeight = (weight.y - springAnchor.y) / numCoils; // Height per coil
+				  
+						ctx.beginPath();
+						ctx.moveTo(springAnchor.x, springAnchor.y);
+						for (let i = 1; i <= numCoils; i++) {
+						  const xOffset = i % 2 === 0 ? -10 : 10; // Alternate left and right
+						  ctx.lineTo(springAnchor.x + xOffset, springAnchor.y + i * coilHeight);
+						}
+						ctx.lineTo(weight.x, weight.y); // Connect to the weight
+						ctx.strokeStyle = '#0000ff';
+						ctx.lineWidth = 2;
+						ctx.stroke();
+					  }
+				  
+					  // Draw the weight (as a coil)
+					  function drawWeight() {
+						ctx.fillStyle = '#ff6600';
+						ctx.fillRect(weight.x - weight.width / 2, weight.y, weight.width, weight.height); // Main weight
+				  
+						// Simulate a copper coil
+						ctx.strokeStyle = '#b87333';
+						ctx.lineWidth = 4;
+						for (let i = 0; i < 6; i++) {
+						  ctx.beginPath();
+						  ctx.moveTo(weight.x - 15, weight.y + i * 7);
+						  ctx.lineTo(weight.x + 15, weight.y + i * 7);
+						  ctx.stroke();
+						}
+					  }
+				  
+					  // Draw the tripod base
+					  function drawTripod() {
+						ctx.beginPath();
+						ctx.moveTo(springAnchor.x - 50, springAnchor.y + 400); // Left leg
+						ctx.lineTo(springAnchor.x - 70, springAnchor.y + 450);
+						ctx.moveTo(springAnchor.x + 50, springAnchor.y + 400); // Right leg
+						ctx.lineTo(springAnchor.x + 70, springAnchor.y + 450);
+						ctx.moveTo(springAnchor.x, springAnchor.y + 400); // Middle leg
+						ctx.lineTo(springAnchor.x, springAnchor.y + 450);
+						ctx.strokeStyle = 'black';
+						ctx.lineWidth = 3;
+						ctx.stroke();
+					  }
+				  
+					  // Draw the ground
+					  function drawGround() {
+						ctx.fillStyle = '#008000';
+						ctx.fillRect(0, canvas.height - groundHeight + groundOffset, canvas.width, groundHeight);
+					  }
+				  
+					  // Update the simulation
+					  function update() {
+						// Ground shaking (simulate earthquake)
+						groundOffset = groundShakeAmplitude * Math.sin(groundShakeFrequency * time);
+				  
+						// Spring force and damping
+						const springForce = -springStiffness * displacement;
+						const dampingForce = -damping * velocity;
+						const netForce = springForce + dampingForce;
+				  
+						// Update physics
+						velocity += netForce;
+						displacement += velocity;
+				  
+						// Update weight position
+						weight.y = springAnchor.y + springLength + displacement + groundOffset;
+				  
+						// Update time
+						time += 0.016;
+					  }
+				  
+					  // Render the scene
+					  function render() {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						drawCasing();
+						drawSpring();
+						drawWeight();
+						drawTripod();
+						drawGround();
+					  }
+				  
+					  // Main animation loop
+					  function animate() {
+						update();
+						render();
+						requestAnimationFrame(animate);
+					  }
+				  
+					  // Start the animation
+					  animate();
+				  
+					  // Adjust ground shake strength dynamically
+					  shakeStrengthControl.addEventListener('input', () => {
+						groundShakeAmplitude = parseFloat(shakeStrengthControl.value);
+					  });
+					</script>
+				  </body>
+				</div>
+				  
+				<div id="menu2" class="container tab-pane fade"><br>
+					
+						  	
+				  <head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<title>Principe de Fonctionnement du Sismomètre TC1</title>
+					<style>
+						body {
+							font-family: "Garamond", monospace;
+							line-height: 1.6;
+							
+							background-color: #f4f4f9;
+							color: #333;
+						}
+						h1 {
+							text-align: center;
+				
+					
+						}
+						section {
+							margin-bottom: 20px;
+							padding: 100px;
+							background: #fff;
+							border-radius: 8px;
+							box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+						
+					</style>
+                    <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interaction avec les cartes</title>
+  <style>
+    body {
+      
+     
+      padding: 100;
+      background-color: #f4f4f4;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content:center;
+      margin-top: 50px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      width: 350px;
+      height: 200px;
+      background-color: #fff;
+      border: 2px solid #ccc;
+      margin: 10px;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+      position: relative; /* Allow positioning of title inside card */
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+    }
+
+    .card h3 {
+      position: absolute;
+      top: 50%; /* Initially centered vertically */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin: 0;
+      font-size: 16px;
+      transition: top 0.3s ease, font-size 0.3s ease;
+    }
+
+    .content {
+      display: none;
+      padding-top: 10px;
+      font-size: 14px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .card.active h3 {
+      top: 25px; /* Move title to the top */
+      font-size: 14px; /* Shrink title */
+    }
+
+    .card .content p {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    <div class="card" onclick="showContent(1)">
+      <h3>Oscillateur Harmonique</h3>
+      <div class="content" id="content-1">
+        <p>
+          Le cœur du dispositif est un système masse-ressort. Un <strong>Slinky</strong> est utilisé comme ressort, et un <strong>aimant en néodyme</strong> sert de masse. 
+          Lorsque le sol bouge, le cadre du sismomètre se déplace, mais l’aimant résiste au mouvement grâce à son inertie. Ce mouvement relatif entre l'aimant et la bobine environnante est essentiel à son fonctionnement.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" onclick="showContent(2)">
+      <h3>Induction Électromagnétique</h3>
+      <div class="content" id="content-2">
+        <p>
+          Une bobine en cuivre est fixée au cadre. Le mouvement relatif de l'aimant à l'intérieur de la bobine génère un courant électrique dans la bobine, conformément à la <strong>loi de Faraday sur l'induction électromagnétique</strong>. 
+          Ce courant traduit les mouvements du sol.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" onclick="showContent(3)">
+      <h3>Amortissement Magnétique</h3>
+      <div class="content" id="content-3">
+        <p>
+          Un second aimant est suspendu sous le premier et placé à l'intérieur d'un tube en cuivre. Lorsque le système masse/ressort bouge, cet aimant secondaire induit des <strong>courants de Foucault</strong> dans le tube. 
+          Ces courants génèrent une force magnétique opposée, qui amortit les oscillations et réduit les "vibrations parasites", permettant d’isoler les signaux sismiques.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" onclick="showContent(4)">
+      <h3>Traitement du Signal</h3>
+      <div class="content" id="content-4">
+        <p>
+          Le courant induit est amplifié par un <strong>amplificateur opérationnel (op-amp)</strong> et filtré pour éliminer les bruits à haute fréquence. Un <strong>convertisseur analogique-numérique (CAN) de 10 bits</strong>, intégré dans un Arduino Uno, convertit le signal en données numériques. 
+          Le système utilise la technique du suréchantillonnage pour améliorer la résolution, offrant ainsi une sortie effective de 16 bits.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" onclick="showContent(5)">
+      <h3>Visualisation des Données</h3>
+      <div class="content" id="content-5">
+        <p>
+          Les données numérisées sont envoyées à un ordinateur via USB et affichées grâce au logiciel <strong>Amaseis</strong>, permettant de visualiser et d’analyser les sismogrammes en temps réel.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showContent(cardNumber) {
+      // Hide all content
+      const allContents = document.querySelectorAll('.content');
+      const allCards = document.querySelectorAll('.card');
+      allContents.forEach(content => content.classList.remove('active'));
+      allCards.forEach(card => card.classList.remove('active'));
+
+      // Show the selected content
+      const selectedContent = document.getElementById(`content-${cardNumber}`);
+      const selectedCard = document.querySelectorAll('.card')[cardNumber - 1];
+      selectedContent.classList.add('active');
+      selectedCard.classList.add('active');
+    }
+  </script>
+
+</body>
+			</div>
+			
+			
+			<div id="menu3" class="container tab-pane fade"><br>
+				  <h3>Donnees et interprétation</h3>
+				  <p> L'historique des ondes sous forme de graphiques.</p>
+			</div>
+			
+			<div id="menu4" class="container tab-pane fade"><br>
+				<h3>Programmation</h3>
+				<p> Codes Python </p>
+		  </div>
+		  
+		</div>
+	  
+	  
+	</div>  
+	
+  </body>
+  
+</html>
